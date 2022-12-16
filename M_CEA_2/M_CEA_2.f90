@@ -57,7 +57,7 @@
 100 Iplt = 0
     Nplt = 0
 
-    Call INPUT(readok, caseok, ensert)
+    CALL INPUT(readok, caseok, ensert)
 
 300 Close (IOINP)
     Close (IOOUT)
@@ -76,7 +76,7 @@
 
     end program M_CEA_2
 
-    subroutine INPUT(readok, caseok, ensert)
+    SUBROUTINE INPUT(readok, caseok, ensert)
     implicit none
     include 'Cea.inc'
     ! dummy arguments
@@ -128,23 +128,23 @@
 
 99001 FORMAT(/,/)
 
-    end subroutine
+    END
 
-    subroutine INFREE
+    SUBROUTINE INFREE(readok, cin, ncin, lcin, dpin)
     implicit none
     include 'Cea.inc'
-    logical turnoff
-
     ! dummy arguments
     character*15 cin(MAXNGC)
     integer ncin
     integer lcin(MAXNGC)
     logical readok
     real*8 dpin(MAXNGC)
+    logical turnoff
     ! local variables
     character*1 ch1(132), cx, nums(13)
     character*24 cnum
     character*3 fmtl(3)
+    
     ! TODO change back to 24
     character*2 numg(13)
     character*4 wl
@@ -166,7 +166,7 @@
     ch1(1) = ' '
     nch1 = 1
 
-    print *, nch1, 'nch1
+    print *, nch1, 'nch1'
+    END
 
-    end subroutine
 
