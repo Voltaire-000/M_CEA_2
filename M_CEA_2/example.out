@@ -5,3 +5,16 @@
 
 
 
+  
+ #  EXAMPLE 1:
+ #     (a)  Assigned-temperature-and-pressure problem (tp).
+ #     (b)  Reactants are H2 and Air.  Since "exploded" formulas are not given,
+ #          these formulas will be taken from the thermodynamic data library,
+ #          thermo.lib.
+ #     (c)  Calculations are for two equivalence ratios (r,eq.ratio =1,1.5).
+ #     (d)  Assigned pressures are 1, 0.1, and 0.01 atm (p(atm)=1,.1,.01).
+ #     (e)  Assigned temperatures are 3000 and 2000 K (t(k)=3000,2000).
+ #     (f)  'only' dataset is used to restrict possible products.
+ #     (g)  Energy units in the final tables are in calories (calories).
+  
+ # 'problem' dataset:

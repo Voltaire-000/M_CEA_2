@@ -124,28 +124,50 @@
 
     print *, 'calling infree'
 
-    Call INFREE(readok, cin, ncin, lcin, dpin)
+100 Call INFREE(Readok, cin, ncin, lcin, dpin)
+    if( .NOT.Readok) GOTO 400
+    code = cin(1)
+    if(code.NE.'    ')then
+        if(code.EQ.'only')then
+            Nonly = MIN(MAXNGC, ncin-1)
+            Do i = 1, Nonly
+                Prod(i) = cin(i+1)
+            EndDo
+        ElseIf(code.EQ.'inse')then
+            Nsert = MIN(20, ncin-1)
+            Do i = 1, Nsert
+                Ensert(i) = cin(i+1)
+            EndDo
+        ElseIf(code.EQ.'omit')then
+            Nomit = MIN(MAXNGC, ncin-1)
+            Do i = 1, Nomit
+                Omit(i) = cin(i+1)
+            EndDo
+        Elseif (code.EQ.'ther')then
+            Newr = .true.
+            GOTO 400
+        end if
+    endif
 
+400 Return    
 99001 FORMAT(/,/)
 
     END
 !***************************************************
-    SUBROUTINE INFREE(readok, cin, ncin, lcin, dpin)
+    SUBROUTINE INFREE(readok, cin, Ncin, lcin, dpin)
     implicit none
     include 'Cea.inc'
     ! dummy arguments
     character*15 cin(MAXNGC)
     integer Ncin
-    integer lcin(MAXNGC)
-    logical readok
-    real*8 dpin(MAXNGC)
-    logical turnoff
+    integer Lcin(MAXNGC)
+    logical Readok
+    real*8 Dpin(MAXNGC)
+    !logical turnoff
     ! local variables
     character*1 ch1(132), cx, nums(13)
     character*24 cnum
     character*3 fmtl(3)
-    
-    ! TODO change back to 24
     character*2 numg(24)
     character*4 wl
     integer i, ich1, j, kcin, nb, nch1, nx
@@ -155,12 +177,12 @@
     Ncin = 1
     Lcin(1) = 0
     kcin = 0
-    Dpin(1) = 0
+    Dpin(1) = 0.D0
 
 100 nb = 1
     nx = 0
     cnum = ''
-    Cin(Ncin) = ''
+    Cin(Ncin) = ' '
     ch1(1) = ' '
     nch1 = 1
 
@@ -170,7 +192,7 @@
     ! find first and last non-blank character
     DO i = 132,1, -1
         nch1 = i
-        if(ch1(i).NE.' '.AND.ch1.NE.' ')GOTO 200
+        if(ch1(i).NE.' '.AND.ch1(i).NE.' ') GOTO 200
     ENDDO
     
 200 DO i = 1, nch1
@@ -186,6 +208,7 @@
 500 readok = .false.    
     
 99001 FORMAT (132A1)    
+99002 FORMAT (1x, 80A1)      
     END
 
 
