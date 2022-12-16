@@ -44,10 +44,16 @@
     if(ex)then
         print *, infile, 'file found'
     end if
+    open (IOINP, File = infile, Status = 'old', Form = 'formatted')
+    open (IOOUT, File = ofile, Status = 'unknown', Form = 'formatted')
+    
+    Write ( IOOUT, 99006)
+    Write ( IOOUT, 99007)
     
     readok = .true.
     Newr = .false.
-    
+100 Iplt = 0
+    Nplt = 0
 
     ! Body of M_CEA_2
     
@@ -57,7 +63,10 @@
 400 stop    
     
 99001 FORMAT (//'Enter file name'//)
-99002 FORMAT (1X, A16, 'Inserted')      
+99002 FORMAT (1X, A16, 'Inserted') 
+      
+99006 FORMAT (/' ***************************')
+99007 FORMAT (/, 9x, 'NASA=Glenn CEA')      
 
     end program M_CEA_2
 

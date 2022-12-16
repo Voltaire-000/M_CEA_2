@@ -1,4 +1,4 @@
-integer MAXNGC, NCOL, Nonly, Nplt, Nsert
+integer MAXNGC, NCOL, Nomit, Nonly, Nplt, Nsert, Iplt
 
 Real*8 Trace
 
@@ -9,4 +9,6 @@ integer IOINP, IOOUT
 Parameter(IOINP = 7)
 Parameter(IOOUT = 8)
 
-Logical Massf, short, Siunit, Debug(NCOL)
+Logical Massf, short, Siunit, Debug(NCOL), Newr
+
+character*200 Pfile
