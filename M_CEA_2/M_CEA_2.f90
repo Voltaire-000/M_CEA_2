@@ -146,14 +146,12 @@
     character*3 fmtl(3)
     
     ! TODO change back to 24
-    character*2 numg(13)
+    character*2 numg(24)
     character*4 wl
     integer i, ich1, j, kcin, nb, nch1, nx
     data fmtl/'(g', '16', '.0)'/
     data nums/'+', '-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.'/
-    data numg/'1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13'/
-    !      TODO figure out line continuation
-    !   '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24'/
+    data numg/'1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24'/
     Ncin = 1
     Lcin(1) = 0
     kcin = 0
