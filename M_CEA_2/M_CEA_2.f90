@@ -75,7 +75,7 @@
 99007 FORMAT (/, 9x, 'NASA=Glenn CEA')
 
     end program M_CEA_2
-
+!*******************************************
     SUBROUTINE INPUT(readok, caseok, ensert)
     implicit none
     include 'Cea.inc'
@@ -129,13 +129,13 @@
 99001 FORMAT(/,/)
 
     END
-
+!***************************************************
     SUBROUTINE INFREE(readok, cin, ncin, lcin, dpin)
     implicit none
     include 'Cea.inc'
     ! dummy arguments
     character*15 cin(MAXNGC)
-    integer ncin
+    integer Ncin
     integer lcin(MAXNGC)
     logical readok
     real*8 dpin(MAXNGC)
@@ -165,6 +165,27 @@
     nch1 = 1
 
     print *, nch1, 'nch1'
+    !   read characters 1 at a time
+    Read(IOINP, 99001, END=500, ERR=500)ch1
+    ! find first and last non-blank character
+    DO i = 132,1, -1
+        nch1 = i
+        if(ch1(i).NE.' '.AND.ch1.NE.' ')GOTO 200
+    ENDDO
+    
+200 DO i = 1, nch1
+        ich1 = i
+        if(ch1(i).NE.' '.AND.ch1(i).NE.' ') GOTO 300
+    ENDDO
+    
+300 if(nch1.EQ.1.OR.ch1(ich1).EQ.'#'.OR.ch1(ich1).EQ.'!')then
+        write(IOOUT, 99002) (ch1(i),i=1, nch1)
+        GOTO 100
+        end if
+    
+500 readok = .false.    
+    
+99001 FORMAT (132A1)    
     END
 
 
