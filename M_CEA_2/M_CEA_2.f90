@@ -52,11 +52,11 @@
     
     readok = .true.
     Newr = .false.
-100 Iplt = 0
-    Nplt = 0
-
-    ! Body of M_CEA_2
-    
+!100 Iplt = 0
+!    Nplt = 0
+   
+300 Close (IOINP)
+    Close (IOOUT)
     
     Read(*,*)
     
