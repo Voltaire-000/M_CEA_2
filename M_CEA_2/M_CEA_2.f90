@@ -44,8 +44,10 @@
     if(ex)then
         print *, infile, 'file found'
     end if
+    
     open (IOINP, File = infile, Status = 'old', Form = 'formatted')
     open (IOOUT, File = ofile, Status = 'unknown', Form = 'formatted')
+    open (IOSCH, Status = 'scratch', Form = 'unformatted')
     
     Write ( IOOUT, 99006)
     Write ( IOOUT, 99007)
@@ -57,6 +59,7 @@
    
 300 Close (IOINP)
     Close (IOOUT)
+    Close (IOSCH)
     
     Read(*,*)
     
