@@ -56,6 +56,8 @@
     Newr = .false.
 100 Iplt = 0
     Nplt = 0
+    
+    Call INPUT(readok, caseok, ensert)
    
 300 Close (IOINP)
     Close (IOOUT)
@@ -74,3 +76,61 @@
 
     end program M_CEA_2
 
+    subroutine INPUT(readok, caseok, ensert)
+    implicit none
+    include 'Cea.inc'
+! dummy arguments
+    logical readok, caseok
+    logical turnoff
+    character*15 ensert(20)
+! local variables
+    character*15 cin(MAXNGC), cx15
+    character*4 code, cx4
+    character*1 cx1
+    character*2 cx2
+    character*3 cx3
+    character*26 lc, uc
+    logical eqrats, incd, phi, pltdat, reacts, refl
+    integer i, ifrmla, ii, in, iv, ix, j, jj, k, lcin(MAXNGC), ncin, nmix
+    integer index
+    real*8 denmtr, dpin(MAXNGC), eratio, hr, mix(MAXNGC), ur, xyz
+    real*8 DABS, DMIN1, DSQRT
+    Save cin, code, cx1, cx15, cx2, cx3, cx4, denmtr, dpin, eqrats, eratio, hr, i
+    Save ifrmla, ii, in, incd, iv, ix, j, jj, k, lcin, mix, ncin, nmix, phi, pltdat
+    Save reacts, refl, ur, xyz
+    
+    turnoff = .true.
+    if(turnoff)then
+        print *, 'Entered Input subroutine'
+    end if
+    
+    DATA uc/'ABCDEFGHIJKLMNOPQRSTUVWXYZ'/
+    DATA lc/'abcdefghijklmnopqrstuvwxyz'/
+    write (IOOUT, 99001)
+    caseok = .true.
+    Nonly = 0
+    Nomit = 0
+    Nsert = 0
+    reacts = .false.
+    Trace = 0
+    Short = .false.
+    Massf = .false.
+    Do i = 1, NCOL
+        Debug(i) = .false.
+    end do
+    Nplt = 0
+    Siunit = .true.
+    pltdat = .false.
+    
+100 Call INFREE(readok, cin, ncin, lcin, dpin)    
+    
+99001 FORMAT(/,/)    
+    
+    end
+    
+    subroutine INFREE
+    implicit none
+    
+    end
+    
+    
