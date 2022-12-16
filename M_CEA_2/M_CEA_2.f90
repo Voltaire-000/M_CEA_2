@@ -27,11 +27,11 @@
     real*8 xi, xln
     real*8 DLOG
     
-    Save caseok, ensert, ex, i, inc, infile, Pfile, iof, j, ln, n, ofile, prefix, readok, xi, xln
+    Save caseok,ensert,ex,i,inc,infile,Pfile,iof,j,ln,n,ofile,prefix,readok,xi,xln
     
     Write(*, 99001)
     Read(*, 99002)prefix
-    ln = INDEX(prefix, ' ')-1
+    ln = INDEX(prefix, ' ') - 1
     infile = prefix(1:ln)//'.inp'
     ofile = prefix(1:ln)//'.out'
     Pfile = prefix(1:ln)//'.plt'
@@ -52,8 +52,8 @@
     
     readok = .true.
     Newr = .false.
-!100 Iplt = 0
-!    Nplt = 0
+100 Iplt = 0
+    Nplt = 0
    
 300 Close (IOINP)
     Close (IOOUT)
@@ -63,7 +63,8 @@
 400 stop    
     
 99001 FORMAT (//'Enter file name'//)
-99002 FORMAT (1X, A16, 'Inserted') 
+99002 FORMAT (a) 
+99003 FORMAT (1X, A16, 'Inserted')      
       
 99006 FORMAT (/' ***************************')
 99007 FORMAT (/, 9x, 'NASA=Glenn CEA')      
