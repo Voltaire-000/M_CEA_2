@@ -1,16 +1,16 @@
-!  M_CEA_2.f90 
-!
-!  FUNCTIONS:
-!  M_CEA_2 - Entry point of console application.
-!
+    !  M_CEA_2.f90
+    !
+    !  FUNCTIONS:
+    !  M_CEA_2 - Entry point of console application.
+    !
 
-!****************************************************************************
-!
-!  PROGRAM: M_CEA_2
-!
-!  PURPOSE:  Entry point for the console application.
-!
-!****************************************************************************
+    !****************************************************************************
+    !
+    !  PROGRAM: M_CEA_2
+    !
+    !  PURPOSE:  Entry point for the console application.
+    !
+    !****************************************************************************
 
     program M_CEA_2
 
@@ -26,9 +26,9 @@
     integer INDEX
     real*8 xi, xln
     real*8 DLOG
-    
+
     Save caseok,ensert,ex,i,inc,infile,Pfile,iof,j,ln,n,ofile,prefix,readok,xi,xln
-    
+
     Write(*, 99001)
     Read(*, 99002)prefix
     ln = INDEX(prefix, ' ') - 1
@@ -40,50 +40,50 @@
         print *, infile, 'file not found'
         Goto 400
     end if
-    
+
     if(ex)then
         print *, infile, 'file found'
     end if
-    
+
     open (IOINP, File = infile, Status = 'old', Form = 'formatted')
     open (IOOUT, File = ofile, Status = 'unknown', Form = 'formatted')
     open (IOSCH, Status = 'scratch', Form = 'unformatted')
-    
+
     Write ( IOOUT, 99006)
     Write ( IOOUT, 99007)
-    
+
     readok = .true.
     Newr = .false.
 100 Iplt = 0
     Nplt = 0
-    
+
     Call INPUT(readok, caseok, ensert)
-   
+
 300 Close (IOINP)
     Close (IOOUT)
     Close (IOSCH)
-    
+
     Read(*,*)
-    
-400 stop    
-    
+
+400 stop
+
 99001 FORMAT (//'Enter file name'//)
-99002 FORMAT (a) 
-99003 FORMAT (1X, A16, 'Inserted')      
-      
+99002 FORMAT (a)
+99003 FORMAT (1X, A16, 'Inserted')
+
 99006 FORMAT (/' ***************************')
-99007 FORMAT (/, 9x, 'NASA=Glenn CEA')      
+99007 FORMAT (/, 9x, 'NASA=Glenn CEA')
 
     end program M_CEA_2
 
     subroutine INPUT(readok, caseok, ensert)
     implicit none
     include 'Cea.inc'
-! dummy arguments
+    ! dummy arguments
     logical readok, caseok
     logical turnoff
     character*15 ensert(20)
-! local variables
+    ! local variables
     character*15 cin(MAXNGC), cx15
     character*4 code, cx4
     character*1 cx1
@@ -98,12 +98,12 @@
     Save cin, code, cx1, cx15, cx2, cx3, cx4, denmtr, dpin, eqrats, eratio, hr, i
     Save ifrmla, ii, in, incd, iv, ix, j, jj, k, lcin, mix, ncin, nmix, phi, pltdat
     Save reacts, refl, ur, xyz
-    
+
     turnoff = .true.
     if(turnoff)then
         print *, 'Entered Input subroutine'
     end if
-    
+
     DATA uc/'ABCDEFGHIJKLMNOPQRSTUVWXYZ'/
     DATA lc/'abcdefghijklmnopqrstuvwxyz'/
     write (IOOUT, 99001)
@@ -121,16 +121,52 @@
     Nplt = 0
     Siunit = .true.
     pltdat = .false.
-    
-100 Call INFREE(readok, cin, ncin, lcin, dpin)    
-    
-99001 FORMAT(/,/)    
-    
-    end
-    
+
+    print *, 'calling infree'
+
+    Call INFREE(readok, cin, ncin, lcin, dpin)
+
+99001 FORMAT(/,/)
+
+    end subroutine
+
     subroutine INFREE
     implicit none
-    
-    end
-    
-    
+    include 'Cea.inc'
+    logical turnoff
+
+    ! dummy arguments
+    character*15 cin(MAXNGC)
+    integer ncin
+    integer lcin(MAXNGC)
+    logical readok
+    real*8 dpin(MAXNGC)
+    ! local variables
+    character*1 ch1(132), cx, nums(13)
+    character*24 cnum
+    character*3 fmtl(3)
+    ! TODO change back to 24
+    character*2 numg(13)
+    character*4 wl
+    integer i, ich1, j, kcin, nb, nch1, nx
+    data fmtl/'(g', '16', '.0)'/
+    data nums/'+', '-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.'/
+    data numg/'1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13'/
+    !      TODO figure out line continuation
+    !   '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24'/
+    Ncin = 1
+    Lcin(1) = 0
+    kcin = 0
+    Dpin(1) = 0
+
+100 nb = 1
+    nx = 0
+    cnum = ''
+    Cin(Ncin) = ''
+    ch1(1) = ' '
+    nch1 = 1
+
+    print *, nch1, 'nch1
+
+    end subroutine
+
