@@ -13,7 +13,7 @@ Parameter(IOTHM = 14)
 Parameter(IOPLT = 15)
 Parameter(IOTRN = 18)
 
-Logical Massf, short, Siunit, Debug(NCOL), Newr
+Logical Massf, short, Siunit, Debug(NCOL), Newr, Trnspt
 
 character*200 Pfile
 character*15 Prod(0:MAXNGC), Omit(0:MAXNGC)

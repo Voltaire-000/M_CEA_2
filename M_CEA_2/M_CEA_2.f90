@@ -145,8 +145,30 @@
             EndDo
         Elseif (code.EQ.'ther')then
             Newr = .true.
+            REWIND IOTHM
+            Call UTHERM(Readok)
+            if( .NOT.Readok)then
+                Write (IOOUT, 99025)
             GOTO 400
-        end if
+            end if
+        Elseif (code.EQ'tran')then
+            Call UTRAN(readok)
+            if( .NOT.Readok)then
+                Write (IOOUT, 99025)
+                GOTO 400
+            end if
+            Elseif (code.EQ.'outp')then
+            DO 120 i = 2, ncin
+                if(lcin(i).LT.0)then
+                    cx2 = cin(i) (1:2)
+                    cx3 = cin(i) (1:3)
+                    cx4 = cin(i) (1:4)
+                    if(cx3.EQ'cal')then
+                        Siunit = .false.
+                    Elseif (cx4.EQ.'tran'.OR.cx3.EQ.'trn')then
+                        Trnspt = .true.
+                    Elseif(cx4.EQ.'trac')then
+                        Trace = dpin(i+1)
     endif
 
 400 Return    
@@ -208,7 +230,18 @@
 500 readok = .false.    
     
 99001 FORMAT (132A1)    
-99002 FORMAT (1x, 80A1)      
+99002 FORMAT (1x, 80A1)    
+99025 FORMAT (/' Fatal error in dataset (INPUT)')      
     END
+!***********************************************
+    SUBROUTINE UTHERM(readok)
+    Stop
+    END
+    
+    !*******************************************
+    SUBROUTINE UTRAN(readok)
+    Stop
+    END
+    !********************************************
 
 
