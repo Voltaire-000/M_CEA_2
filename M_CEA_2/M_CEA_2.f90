@@ -150,20 +150,20 @@
             if( .NOT.Readok)then
                 Write (IOOUT, 99025)
             GOTO 400
-            end if
-        Elseif (code.EQ'tran')then
+            endif
+        Elseif (code.EQ.'tran')then
             Call UTRAN(readok)
             if( .NOT.Readok)then
                 Write (IOOUT, 99025)
                 GOTO 400
-            end if
+            endif
             Elseif (code.EQ.'outp')then
             DO 120 i = 2, ncin
                 if(lcin(i).LT.0)then
                     cx2 = cin(i) (1:2)
                     cx3 = cin(i) (1:3)
                     cx4 = cin(i) (1:4)
-                    if(cx3.EQ'cal')then
+                    if(cx3.EQ.'cal')then
                         Siunit = .false.
                     Elseif (cx4.EQ.'tran'.OR.cx3.EQ.'trn')then
                         Trnspt = .true.
@@ -192,10 +192,87 @@
                     ENDIF
                 Endif
                 
-120 Continue                
-
+120         Continue    
+            Elseif (code.EQ.'reac')then
+                reacts = .true.
+                Moles = .false.
+                Nreac = 0
+                DO i = 1, MAXR
+                    Pecwt(i) = -1
+                EndDo
+                i = 1
+140             i = i + 1
+                if ( i.LE.ncin )then
+                    if ( lcin(i).NE.0 )then
+                        if ( lcin(i).GT.0 ) then
+                            WRITE (IOOUT,99003) cin(i)
+                            GOTO 140
+                Endif
+              cx15 = cin(i)
+              cx1 = cx15(:1)
+              cx2 = cx15(:2)
+              cx3 = cx15(:3)
+              cx4 = cx15(:4)
+! new reactant
+              if ( cx2.NE.'na'.AND.cx2.NE.'ox'.AND.cx2.NE.'fu' )then
+                if ( cx1.EQ.'m'.OR.cx1.EQ.'w' )then
+                  if ( lcin(i+1).GT.0 )then
+                    i = i + 1
+                    Pecwt(Nreac) = dpin(i)
+                  ELSE
+                    Caseok = .false.
+                    WRITE (IOOUT,99004)
+                  ENDIF
+                  IF ( cx1.EQ.'m'.AND.Nreac.EQ.1 ) Moles = .true.
+                  IF ( cx1.EQ.'m'.AND..NOT.Moles.OR.cx1.EQ.'w'.AND.Moles )then
+                    Caseok = .false.
+                    WRITE (IOOUT,99005)
+                  ENDIF
+                  GOTO 140
+                ENDIF
+! look for temperatures
+                if ( cx1.EQ.'t' )then
+                  if ( lcin(i+1).GT.0 )then
+                    i = i + 1
+                    Rtemp(Nreac) = dpin(i)
+                    if ( lcin(i-1).LT.1 )then
+                      if ( INDEX(cx15,'r').GT.0 ) Rtemp(Nreac) = Rtemp(Nreac)/1.8D0
+                      if ( INDEX(cx15,'c').GT.0 ) Rtemp(Nreac) = Rtemp(Nreac) + 273.15D0
+                      if ( INDEX(cx15,'f').GT.0 ) Rtemp(Nreac) = (Rtemp(Nreac)-32.D0)/1.8D0 + 273.15D0
+                    Endif
+                  ELSE
+                    WRITE (IOOUT,99006)
+                    Caseok = .false.
+                  ENDIF
+                  GOTO 140
+                ENDIF
+! look for enthalpy
+                if ( cx1.EQ.'h'.OR.cx1.EQ.'u' )then
+                  Energy(Nreac) = cx15
+                  if ( lcin(i+1).GT.0 )then
+                    i = i + 1
+                    Enth(Nreac) = dpin(i)*1000.D0/Rr
+                    if ( INDEX(cin(i-1),'c').GT.0 ) Enth(Nreac) = Enth(Nreac)*4.184D0
+                    if ( INDEX(cin(i-1),'k').GT.0 ) Enth(Nreac) = Enth(Nreac)*1000.D0
+                  Endif
+                  GOTO 140
+                ENDIF
+! look for density
+                if ( cx3.EQ.'rho'.OR.cx3.EQ.'den' )then
+                  if ( lcin(i+1).GT.0 )then
+                    i = i + 1
+                    Dens(Nreac) = dpin(i)
+                    if ( INDEX(cx15,'kg').GT.0 ) Dens(Nreac) = Dens(Nreac)/1000.D0
+                  ENDIF
+                  GOTO 140
+                ENDIF 
 400 Return    
-99001 FORMAT(/,/)
+99001 FORMAT (/,/)
+99002 FORMAT ()
+99003 FORMAT ()     
+99004 FORMAT ()
+99005 FORMAT ()   
+99006 FORMAT ()      
 
     END
 !***************************************************

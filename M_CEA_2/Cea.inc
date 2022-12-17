@@ -16,4 +16,4 @@ Parameter(IOTRN = 18)
 Logical Massf, short, Siunit, Debug(NCOL), Newr, Trnspt
 
 character*200 Pfile
-character*15 Prod(0:MAXNGC), Omit(0:MAXNGC)
+character*15 Prod(0:MAXNGC), Omit(0:MAXNGC), Pltvar(20)
