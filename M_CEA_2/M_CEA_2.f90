@@ -856,9 +856,160 @@
     END
 !***********************************************
     SUBROUTINE UTHERM(readok)
+    ! read thermo data from I/O unit 7 in record format and write
+    ! unformatted on I/O unit IOTHM. reorder data gases first
     implicit none
+    include 'Cea.inc'
     logical Readok
+! local variables
+    character*15 name
+    character*16 namee
+    character*65 notes
+    character*2 sym(5)
+    character*6 date
+    integer i, ifaz, ifzml, inew, int, j, k, kk, l, nall, ncoef, ngl, ns, ntl
+    integer INDEX
+    logical fill(3)
+    Real*8 aa,atms, cpfix, dlt, expn(8), fno(5), hform, hh, mwt, templ(9), tex
+    Real*8 tgl(4), thermo(9,3), tinf, tl(2), ttl, tx
+    Real*8 DBLE, DLOG
     
+    ngl = 0
+    ns = 0
+    nall = 0
+    ifzml = 0
+    inew = 0
+    tinf = 1.D06
+    REWIND IOSCH
+    Read(IOINP, 99001) tgl, Thdate
+    DO i = 1,3
+        fill(i) = .true.
+        DO j = 1,9
+            thermo(j,i) = 0
+        EndDo
+        hform = 0.
+        tl(1) = 0.
+        tl(2) = 0.
+        Read(IOINP, 99002,END=300,ERR=400)name,notes
+        IF ( name(:3).EQ.'END'.OR.name(:3).EQ.'end' ) THEN
+        IF ( INDEX(name,'ROD').EQ.0.AND.INDEX(name,'rod').EQ.0 )GOTO 300
+        ns = nall
+        GOTO 100
+      ENDIF
+      READ (IOINP,99003,ERR=400) ntl,date,(sym(j),fno(j),j=1,5),ifaz,mwt,hform
+      WRITE (IOOUT,99004) name,date,hform,notes
+        IF ( ntl.EQ.0 ) THEN
+        IF ( ns.EQ.0 ) GOTO 300
+        nall = nall + 1
+        READ (IOINP,99005,ERR=400) tl,ncoef,expn,hh
+        thermo(1,1) = hform
+        WRITE (IOSCH) name,ntl,date,(sym(j),fno(j),j=1,5),ifaz,tl,mwt,thermo
+        GOTO 100
+        ELSEIF ( name.EQ.'Air' ) THEN
+        sym(1) = 'N'
+        fno(1) = 1.56168D0
+        sym(2) = 'O'
+        fno(2) = .419590D0
+        sym(3) = 'AR'
+        fno(3) = .009365D0
+        sym(4) = 'C'
+        fno(4) = .000319D0
+        ELSEIF ( name.EQ.'e-' ) THEN
+        mwt = 5.48579903D-04
+        ENDIF
+        DO 200 i = 1,ntl
+            READ (IOINP,99005,ERR=400) tl,ncoef,expn,hh
+            READ (IOINP,99006,ERR=400) templ
+            IF ( ifaz.EQ.0.AND.i.GT.3 ) GOTO 400
+            IF ( ifaz.LE.0 ) THEN
+                IF ( tl(2).GT.tgl(4)-.01D0 ) THEN
+                ifaz = -1
+                namee = '*'//name
+                name = namee(:15)
+            ENDIF
+            IF ( tl(1).GE.tgl(i+1) ) GOTO 200
+          int = i
+          fill(i) = .FALSE.
+        ELSE
+          int = 1
+          IF ( i.GT.1 ) THEN
+            DO k = 1,7
+              thermo(k,1) = 0.D0
+            ENDDO
+          ENDIF
+        ENDIF
+        DO 150 l = 1,ncoef
+          DO k = 1,7
+            IF ( expn(l).EQ.DBLE(k-3) ) THEN
+              thermo(k,int) = templ(l)
+              GOTO 150
+            ENDIF
+          ENDDO
+ 150    CONTINUE
+        thermo(8,int) = templ(8)
+        thermo(9,int) = templ(9)
+        IF ( ifaz.GT.0 ) THEN
+          nall = nall + 1
+          IF ( ifaz.GT.ifzm1 ) THEN
+            inew = inew + 1
+          ELSE
+            inew = i
+          ENDIF
+          WRITE (IOSCH) name,ntl,date,(sym(j),fno(j),j=1,5),inew,tl,mwt,thermo
+        ENDIF
+ 200  CONTINUE
+      ifzm1 = ifaz
+      IF ( ifaz.LE.0 ) THEN
+        inew = 0
+        nall = nall + 1
+        IF ( ifaz.LE.0.AND.ns.EQ.0 ) THEN
+          ngl = ngl + 1
+          IF ( fill(3) ) THEN
+            atms = 0.
+            DO i = 1,5
+              IF ( sym(i).EQ.' '.OR.sym(i).EQ.'E' ) GOTO 210
+              atms = atms + fno(i)
+            ENDDO
+!C FOR GASES WITH NO COEFFICIENTS FOR TGL(3)-TGL(4) INTERVAL,
+!C CALCULATE ESTIMATED COEFFICIENTS. (STRAIGHT LINE FOR CP/R)
+     210    aa = 2.5D0
+            IF ( atms.GT.1.9 ) aa = 4.5D0
+            IF ( atms.GT.2.1 ) aa = 3.*atms - 1.75D0
+            ttl = tl(2)
+            tx = ttl - tinf
+            cpfix = 0
+            templ(8) = 0.
+            templ(9) = 0.
+            dlt = DLOG(ttl)
+            DO k = 7,1, - 1
+              kk = k - 3
+              IF ( kk.EQ.0 ) THEN
+                cpfix = cpfix + thermo(k,2)
+                templ(8) = templ(8) + thermo(k,2)
+                templ(9) = templ(9) + thermo(k,2)*dlt
+              ELSE
+                tex = ttl**kk
+                cpfix = cpfix + thermo(k,2)*tex
+                templ(9) = templ(9) + thermo(k,2)*tex/kk
+                IF ( kk.EQ.-1 ) THEN
+                  templ(8) = templ(8) + thermo(k,2)*dlt/ttl
+                ELSE
+                  templ(8) = templ(8) + thermo(k,2)*tex/(kk+1)
+                ENDIF
+              ENDIF
+            ENDDO
+            templ(2) = (cpfix-aa)/tx
+            thermo(4,3) = templ(2)
+            templ(1) = cpfix - ttl*templ(2)
+            thermo(3,3) = templ(1)
+            thermo(8,3) = thermo(8,2) + ttl*(templ(8)-templ(1)-.5*templ(2)*ttl)
+            thermo(9,3) = -templ(1)*dlt + thermo(9,2) + templ(9) - templ(2)*ttl
+          ENDIF
+        ENDIF    
+! write coefficients on scratch I/O unit IOSCH
+        WRITE (IOSCH) name,ntl,date,(sym(j),fno(j),j=1,5),ifaz,tl,mwt,thermo
+      ENDIF
+      GOTO 100
     Stop
     END
     
