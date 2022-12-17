@@ -858,17 +858,22 @@
     END
 !***********************************************
     SUBROUTINE UTHERM(readok)
+    implicit none
     logical Readok
+    
     Stop
     END
     
     !*******************************************
     SUBROUTINE UTRAN(readok)
+    implicit none
     logical Readok
+    
     Stop
     END
     !********************************************
     SUBROUTINE REACT
+    implicit none
     
     Stop
     END
