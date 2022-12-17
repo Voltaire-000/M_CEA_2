@@ -725,7 +725,7 @@
     implicit none
     include 'Cea.inc'
     ! dummy arguments
-    character*15 cin(MAXNGC)
+    character*15 Cin(MAXNGC)
     integer Ncin
     integer Lcin(MAXNGC)
     logical Readok
@@ -736,7 +736,7 @@
     character*24 cnum
     character*3 fmtl(3)
     character*2 numg(24)
-    character*4 wl
+    character*4 w1
     integer i, ich1, j, kcin, nb, nch1, nx
     data fmtl/'(g', '16', '.0)'/
     data nums/'+', '-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.'/
@@ -770,13 +770,91 @@
 300 if(nch1.EQ.1.OR.ch1(ich1).EQ.'#'.OR.ch1(ich1).EQ.'!')then
         write(IOOUT, 99002) (ch1(i),i=1, nch1)
         GOTO 100
-        end if
+    end if
+    w1 = ch1(ich1)//ch1(ich+1)//ch1(ich1+2)//ch1(ich1+3)
+! is keyword start or end of dataset
+    If(w1.EQ.'ther'.OR.w1.EQ.'tran'.OR.w1.EQ.'prob'.OR.w1.EQ.'reac'.OR.w1.EQ.'outp'.OR.w1.EQ.'omit'.OR.w1.EQ.'only'.OR.w1.EQ.'inse'.OR.w1(1:3).EQ.'end')then
+        If(Ncin.EQ.1)then
+            Cin(Ncin) = w1
+            If(w1(1:3).EQ.'end'.OR.w1.EQ.'ther'.OR.w1.EQ.'tran')then
+                Write(IOOUT, 99002) (ch1(i),i=1,nch1)
+                Return
+            Endif
+            ich1 = ich1 + 4
+            nx = 4
+            Lcin(1) = -4
+        Else
+! keyword read for next dataset
+            BACKSPACE IOINP
+            If(nx.EQ.0)Ncin = Ncin -1
+            Return
+        Endif
+      ELSEIF ( Ncin.EQ.1 ) THEN
+        WRITE (IOOUT,99003)
+        GOTO 500
+      ENDIF
+      WRITE (IOOUT,99002) (ch1(i),i=1,nch1)
+      DO 400 i = ich1,nch1
+        cx = ch1(i)
+! LOOK FOR DELIMITER STRINGS
+        IF ( cx.EQ.','.AND.(Lcin(Ncin).GT.0.OR.nx.EQ.0) ) cx = ' '
+        IF ( cx.EQ.'='.AND.(Lcin(Ncin).LT.0.OR.nx.EQ.0) ) cx = ' '
+        IF ( cx.NE.' '.AND.cx.NE.'	' ) THEN
+! LOOK FOR CHARACTER STRINGS
+          nx = nx + 1
+          IF ( Ncin.GT.1 ) THEN
+            cnum(nx:nx) = cx
+            IF ( nx.LE.15 ) Cin(Ncin) = cnum
+            IF ( nx.EQ.1 ) THEN
+! IS THIS A NUMERIC?
+              DO j = 1,13
+                IF ( ch1(i).EQ.nums(j) ) THEN
+                  Lcin(Ncin) = kcin
+                  GOTO 310
+                ENDIF
+              ENDDO
+              Lcin(Ncin) = -1
+              kcin = Ncin
+            ELSEIF ( Lcin(Ncin).LT.0 ) THEN
+              Lcin(Ncin) = -nx
+            ENDIF
+ 310        nb = 1
+          ENDIF
+          IF ( i.LT.nch1.OR.Lcin(Ncin).LT.0 ) GOTO 400
+        ENDIF
+        IF ( nb.EQ.1..AND.nx.GT.0 ) THEN
+          IF ( Ncin.GT.0.AND.Lcin(Ncin).GT.0 ) THEN
+! CONVERT NUMERIC CHARACTER STRINGS TO REAL*8 VARIABLES (DPIN)
+            fmtl(2) = numg(MIN(24,nx))
+! INTERNAL READ TO CONVERT TO NUMERIC
+            READ (cnum,fmtl,ERR=320) Dpin(Ncin)
+          ENDIF
+          GOTO 340
+ 320      IF ( Cin(Ncin-1)(:4).NE.'case' ) WRITE (IOOUT,99004) Cin(i)
+          Lcin(Ncin) = 0
+ 340      Ncin = Ncin + 1
+          Cin(Ncin) = ' '
+          Lcin(Ncin) = 0
+          Dpin(Ncin) = 0.D0
+          nx = 0
+          cnum = ' '
+        ENDIF
+        nb = nb + 1
+ 400  CONTINUE
+      IF ( nx.GT.0 ) THEN
+        Ncin = Ncin + 1
+        Lcin(Ncin) = 0
+        Dpin(Ncin) = 0.D0
+      ENDIF
+      GOTO 100  
     
 500 readok = .false.    
     
 99001 FORMAT (132A1)    
-99002 FORMAT (1x, 80A1)    
-99025 FORMAT (/' Fatal error in dataset (INPUT)')      
+99002 FORMAT (1x, 80A1) 
+99003 FORMAT (/' Fatal error in input format (INFREE)')
+99004 FORMAT (/' Warning number bad ',A15,' (INFREE)')      
+     
     END
 !***********************************************
     SUBROUTINE UTHERM(readok)
