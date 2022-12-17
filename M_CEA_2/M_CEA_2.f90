@@ -717,8 +717,6 @@
 99023 FORMAT (/' Warning keyword missing')
 99024 FORMAT (/' max number assigned',A15,' values is',I3,'(INPUT)',/)
 99025 FORMAT (/' fatal error in dataset (INPUT)')
-      
-
     END
 !***************************************************
     SUBROUTINE INFREE(readok, cin, Ncin, lcin, dpin)
@@ -771,7 +769,7 @@
         write(IOOUT, 99002) (ch1(i),i=1, nch1)
         GOTO 100
     end if
-    w1 = ch1(ich1)//ch1(ich+1)//ch1(ich1+2)//ch1(ich1+3)
+    w1 = ch1(ich1)//ch1(ich1+1)//ch1(ich1+2)//ch1(ich1+3)
 ! is keyword start or end of dataset
     If(w1.EQ.'ther'.OR.w1.EQ.'tran'.OR.w1.EQ.'prob'.OR.w1.EQ.'reac'.OR.w1.EQ.'outp'.OR.w1.EQ.'omit'.OR.w1.EQ.'only'.OR.w1.EQ.'inse'.OR.w1(1:3).EQ.'end')then
         If(Ncin.EQ.1)then
