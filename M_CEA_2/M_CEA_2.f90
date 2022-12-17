@@ -152,7 +152,7 @@
             GOTO 400
             endif
         Elseif (code.EQ.'tran')then
-            Call UTRAN(readok)
+            Call UTRAN(Readok)
             if( .NOT.Readok)then
                 Write (IOOUT, 99025)
                 GOTO 400
@@ -701,13 +701,13 @@
 99007 FORMAT (/' Warning ',A15,' not recognized')      
 99008 FORMAT (/' options : TP=',L1,' HP=',L1,' SP=',L1,' TV=',L1)
 99009 FORMAT (/' T,K =',7F11.4)
-99010 FORMAT (/lp,' Trace=',E9.2,' S/R=',E13.6,' H/R=',E13.6,' U/R=',E13.6)
-99011 FORMAT (/' Specific volumn =',lp,(4E14.7))
+99010 FORMAT (/1p,' Trace=',E9.2,' S/R=',E13.6,' H/R=',E13.6,' U/R=',E13.6)
+99011 FORMAT (/' Specific volumn =',1p,(4E14.7))
 99012 FORMAT (/' Pc,Bar =',7F13.6)
 99013 FORMAT (/' Pc/P =',9F11.4)
 99014 FORMAT (/' subsonic area ratio=',(5F11.4))
 99015 FORMAT (/' supersonic area ratio =',(5F11.4))
-99016 FORMAT (/' nfz=',i3,lp,' Mdot/Ac=',el13.6,' Ac/At=',e13.6)
+99016 FORMAT (/' nfz=',i3,1p,' Mdot/Ac=',e13.6,' Ac/At=',e13.6)
 99017 FORMAT (/' P, Bar=',7F13.6)
 99018 FORMAT (/' Error reactants')
 99019 FORMAT (/' error Eq ratio',E11.4'(INPUT)')
