@@ -447,11 +447,9 @@
           IF ( Detn.OR.Shock ) Newr = .TRUE.
           IF ( .NOT.Short ) THEN
             WRITE (IOOUT,99008) Tp,(Hp.AND..NOT.Vol),Sp,(Tp.AND.Vol),(Hp.AND.Vol),(Sp.AND.Vol),Detn,Shock,refl,incd,Rkt,Froz,Eql,Ions,Siunit,Debugf,Shkdbg,Detdbg,Trnspt
-            IF ( T(1).GT.0. ) 
-            WRITE (IOOUT,99009) (T(jj),jj=1,Nt)
+            IF ( T(1).GT.0. ) WRITE (IOOUT,99009) (T(jj),jj=1,Nt)
             WRITE (IOOUT,99010) Trace,S0,hr,ur
-            IF ( Np.GT.0.AND.Vol ) 
-            WRITE (IOOUT,99011) (V(jj)*1.D-05,jj=1,Np)
+            IF ( Np.GT.0.AND.Vol ) WRITE (IOOUT,99011) (V(jj)*1.D-05,jj=1,Np)
           ENDIF
           IF ( Rkt ) THEN
             IF ( Nt.EQ.0 ) Hp = .TRUE.
@@ -701,8 +699,8 @@
 99005 FORMAT (/' Moles and percents')   
 99006 FORMAT (/' Reactant Temp missing')  
 99007 FORMAT (/' Warning ',A15,' not recognized')      
-99008 FORMAT (/' options : TP=',L1,' HP=',L1,' SP=',L1,' TV=',L1,')
-99009 FORMAT (/'' T.K =',7F11.4)
+99008 FORMAT (/' options : TP=',L1,' HP=',L1,' SP=',L1,' TV=',L1)
+99009 FORMAT (/' T,K =',7F11.4)
 99010 FORMAT (/lp,' Trace=',E9.2,' S/R=',E13.6,' H/R=',E13.6,' U/R=',E13.6)
 99011 FORMAT (/' Specific volumn =',lp,(4E14.7))
 99012 FORMAT (/' Pc,Bar =',7F13.6)
