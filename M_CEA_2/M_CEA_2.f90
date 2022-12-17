@@ -780,11 +780,13 @@
     END
 !***********************************************
     SUBROUTINE UTHERM(readok)
+    logical Readok
     Stop
     END
     
     !*******************************************
     SUBROUTINE UTRAN(readok)
+    logical Readok
     Stop
     END
     !********************************************
