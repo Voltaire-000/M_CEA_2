@@ -169,7 +169,30 @@
                         Trnspt = .true.
                     Elseif(cx4.EQ.'trac')then
                         Trace = dpin(i+1)
-    endif
+                    Elseif ( cin(i)(:5).EQ.'short' )then
+                        Short = .true.
+                    Elseif ( cin(i)(:5).EQ.'massf' )then
+                        Massf = .true.
+                    Elseif ( cx3.EQ.'deb'.OR.cx3.EQ.'dbg' )then
+                        DO j = i + 1,ncin
+                            IF ( lcin(j).NE.i ) GOTO 120
+                            k = dpin(j)
+                            IF ( k.LE.NCOL ) Debug(k) = .true.
+                            lcin(j) = 0
+                        EndDo
+                    Elseif ( cx2.EQ.'si' )then
+                        Siunit = .true.
+                    Elseif ( pltdat.AND.Nplt.LT.20 )then
+                        Nplt = Nplt + 1
+                        Pltvar(Nplt) = cin(i)
+                    Elseif ( cx2.EQ.'pl' )then
+                        pltdat = .true.
+                    ELSE
+                        WRITE (IOOUT,99002) cin(i)
+                    ENDIF
+                Endif
+                
+120 Continue                
 
 400 Return    
 99001 FORMAT(/,/)
