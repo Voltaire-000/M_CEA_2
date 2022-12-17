@@ -519,6 +519,180 @@
         ENDIF
       ENDIF
       GOTO 100
+! process numerical data following "PROB' literals
+200 in = 0
+      nmix = 0
+      ii = iv
+      DO i = ii,ncin
+        iv = i
+        IF ( lcin(i).NE.0 ) THEN
+          IF ( lcin(i).LT.0 ) THEN
+            IF ( in.GT.0 ) GOTO 300
+            in = i
+          ELSE
+            IF ( lcin(i).NE.in ) GOTO 300
+            nmix = nmix + 1
+            mix(nmix) = dpin(i)
+            lcin(i) = 0
+          ENDIF
+        ENDIF
+      ENDDO
+300  IF ( nmix.LE.0 ) THEN
+        IF ( iv.LT.ncin ) GOTO 200
+        GOTO 100
+      ENDIF
+      cx15 = cin(in)
+      cx1 = cx15(:1)
+      cx2 = cx15(:2)
+      cx3 = cx15(:3)
+      cx4 = cx15(:4)
+      IF ( cx1.EQ.'t' ) THEN
+        Nt = nmix
+        IF ( nmix.GT.MAXMIX ) THEN
+          Nt = MAXMIX
+          WRITE (IOOUT,99024) 't',Nt
+        ENDIF
+        DO i = 1,Nt
+          IF ( cx4.NE.'tces' ) THEN
+            T(i) = mix(i)
+            IF ( lcin(in).LT.-1 ) THEN
+              IF ( INDEX(cx15,'r').GT.0 ) T(i) = T(i)/1.8D0
+              IF ( INDEX(cx15,'c').GT.0 ) T(i) = T(i) + 273.15D0
+              IF ( INDEX(cx15,'f').GT.0 ) T(i) = (T(i)-32.D0)/1.8D0 + 273.15D0
+            ENDIF
+          ENDIF
+        ENDDO
+      ELSEIF ( (cx2.EQ.'pc'.OR.cx2.EQ.'pi').AND.INDEX(cx15(3:15),'p').GT.0.AND.INDEX(cx15,'psi').EQ.0 ) THEN
+        Npp = nmix
+        IF ( nmix.GT.2*NCOL ) THEN
+          Npp = 2*NCOL
+          WRITE (IOOUT,99024) 'pcp',Npp
+        ENDIF
+        DO i = 1,Npp
+          Pcp(i) = mix(i)
+        ENDDO
+      ELSEIF ( cx1.EQ.'p'.AND.cx3.NE.'phi' ) THEN
+        Np = nmix
+        IF ( nmix.GT.MAXPV ) THEN
+          Np = MAXPV
+          WRITE (IOOUT,99024) 'p',Np
+        ENDIF
+        DO 350 i = 1,Np
+          P(i) = mix(i)
+          IF ( INDEX(cx15,'psi').NE.0 ) THEN
+            P(i) = P(i)/14.696006D0
+          ELSEIF ( INDEX(cx15,'mmh').NE.0 ) THEN
+            P(i) = P(i)/760.D0
+          ELSEIF ( INDEX(cx15,'atm').EQ.0 ) THEN
+            GOTO 350
+          ENDIF
+          P(i) = P(i)*1.01325D0
+ 350    CONTINUE
+      ELSEIF ( cx3.EQ.'rho' ) THEN
+        xyz = 1.D02
+        IF ( INDEX(cx15,'kg').NE.0 ) xyz = 1.D05
+        Np = nmix
+        IF ( nmix.GT.MAXPV ) THEN
+          Np = MAXPV
+          WRITE (IOOUT,99024) 'rho',Np
+        ENDIF
+        DO i = 1,Np
+          V(i) = xyz/mix(i)
+        ENDDO
+      ELSEIF ( cx1.EQ.'v' ) THEN
+        xyz = 1.D02
+        IF ( INDEX(cx15,'kg').NE.0 ) xyz = 1.D05
+        Np = nmix
+        IF ( nmix.GT.MAXPV ) THEN
+          Np = MAXPV
+          WRITE (IOOUT,99024) 'v',Np
+        ENDIF
+        DO i = 1,Np
+          V(i) = mix(i)*xyz
+        ENDDO
+      ELSEIF ( cx3.EQ.'nfz'.OR.cx3.EQ.'nfr' ) THEN
+        Nfz = mix(1)
+        Froz = .TRUE.
+      ELSEIF ( cx4.EQ.'tces' ) THEN
+        Tcest = mix(1)
+      ELSEIF ( cx4.EQ.'trac' ) THEN
+        Trace = mix(1)
+      ELSEIF ( cx3.EQ.'s/r' ) THEN
+        S0 = mix(1)
+      ELSEIF ( cx3.EQ.'u/r'.OR.cx2.EQ.'ur' ) THEN
+        ur = mix(1)
+      ELSEIF ( cx3.EQ.'h/r'.OR.cx2.EQ.'hr' ) THEN
+        hr = mix(1)
+      ELSEIF ( cx2.EQ.'u1' ) THEN
+        Nsk = nmix
+        IF ( nmix.GT.NCOL ) THEN
+          Nsk = NCOL
+          WRITE (IOOUT,99024) 'u1',Nsk
+        ENDIF
+        DO i = 1,Nsk
+          U1(i) = mix(i)
+        ENDDO
+      ELSEIF ( cx4.EQ.'mach' ) THEN
+        Nsk = nmix
+        IF ( nmix.GT.NCOL ) THEN
+          Nsk = NCOL
+          WRITE (IOOUT,99024) 'mach1',Nsk
+        ENDIF
+        DO i = 1,Nsk
+          Mach1(i) = mix(i)
+        ENDDO
+      ELSEIF ( cx3.EQ.'sub' ) THEN
+        Nsub = nmix
+        IF ( nmix.GT.13 ) THEN
+          Nsub = 13
+          WRITE (IOOUT,99024) 'subar',Nsub
+        ENDIF
+        DO i = 1,Nsub
+          Subar(i) = mix(i)
+        ENDDO
+      ELSEIF ( cx3.EQ.'sup' ) THEN
+        Nsup = nmix
+        IF ( nmix.GT.13 ) THEN
+          Nsup = 13
+          WRITE (IOOUT,99024) 'supar',Nsup
+        ENDIF
+        DO i = 1,Nsup
+          Supar(i) = mix(i)
+        ENDDO
+      ELSEIF ( cx2.EQ.'ac' ) THEN
+        Acat = mix(1)
+      ELSEIF ( cx4.EQ.'mdot'.OR.cx2.EQ.'ma' ) THEN
+        Ma = mix(1)
+      ELSEIF ( cx4.EQ.'case' ) THEN
+        Case = cin(in+1)
+        lcin(in+1) = 0
+      ELSEIF ( Nof.EQ.0.AND.(cx3.EQ.'phi'.OR.cx3.EQ.'o/f'.OR.cx3.EQ.'f/a'.OR.cx2.EQ.'%f'.OR.cx1.EQ.'r') ) THEN
+        Nof = nmix
+        IF ( nmix.GT.MAXMIX ) THEN
+          Nof = MAXMIX
+          WRITE (IOOUT,99024) 'o/f',Nof
+        ENDIF
+        DO k = 1,Nof
+          Oxf(k) = mix(k)
+        ENDDO
+        IF ( cx3.EQ.'phi' ) THEN
+          phi = .TRUE.
+        ELSEIF ( cx1.EQ.'r' ) THEN
+          eqrats = .TRUE.
+        ELSEIF ( cx3.EQ.'f/a' ) THEN
+          DO k = 1,Nof
+            IF ( Oxf(k).GT.0. ) Oxf(k) = 1./Oxf(k)
+          ENDDO
+        ELSEIF ( cx4.EQ.'%fue' ) THEN
+          DO k = 1,Nof
+            IF ( Oxf(k).GT.0. ) Oxf(k) = (100.-Oxf(k))/Oxf(k)
+          ENDDO
+        ENDIF
+      ELSE
+        WRITE (IOOUT,99002) cx15
+      ENDIF
+      IF ( iv.GE.ncin ) GOTO 100
+      GOTO 200
 400 Return    
 99001 FORMAT (/,/)
 99002 FORMAT ()
