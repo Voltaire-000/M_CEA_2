@@ -18,3 +18,32 @@
  #     (g)  Energy units in the final tables are in calories (calories).
   
  # 'problem' dataset:
+    problem case=Example-1 tp  p(atm)=1,.1,.01,t(k)=3000,2000,
+              r,eq.ratio=1,1.5
+ # 'reactants' dataset:
+    reac
+      fuel= H2  moles = 1.
+      oxid= Air moles = 1.
+ # 'only' dataset:
+    only  Ar    C   CO  CO2  H   H2   H2O  HNO   HO2   HNO2  HNO3  N   NH
+       NO   N2   N2O3  O  O2  OH  O3
+ # 'output' dataset:
+    output calories
+ # 'end' dataset
+    end
+
+ options : TP=T HP=F SP=F TV=F
+
+ options : TP=F HP=F SP=F TV=F
+
+ options : TP=F HP=F SP=F TV=F
+
+ options : TP=F HP=F SP=F TV=F
+
+ options : TP=F HP=F SP=F TV=
+
+ T,K =  3000.0000  2000.0000
+
+ Trace= 0.00E+00 S/R= 0.000000E+00 H/R= 0.000000E+00 U/R= 0.000000E+00
+
+ P, Bar=     1.013250     0.101325     0.010133
