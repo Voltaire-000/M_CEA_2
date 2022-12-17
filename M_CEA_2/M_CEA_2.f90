@@ -362,7 +362,163 @@
           Nt = 1
           Trnspt = .FALSE.
 ! process literal variables in 'PROB' dataset that do not have numerical data
-          
+        DO 160 i = 2,ncin
+            IF ( lcin(i).LT.0 ) THEN
+              DO j = i + 1,ncin
+                IF ( lcin(j).EQ.i ) GOTO 160
+              ENDDO
+              cx15 = cin(i)
+              cx2 = cx15(:2)
+              cx3 = cx15(:3)
+              cx4 = cx15(:4)
+              IF ( cx4.EQ.'case' ) THEN
+                Case = cin(i+1)
+                lcin(i+1) = 0
+              ELSEIF ( cx2.EQ.'tp'.OR.cx2.EQ.'pt' ) THEN
+                Tp = .TRUE.
+              ELSEIF ( cx2.EQ.'hp'.OR.cx2.EQ.'ph' ) THEN
+                Hp = .TRUE.
+              ELSEIF ( cx2.EQ.'sp'.OR.cx2.EQ.'ps' ) THEN
+                Sp = .TRUE.
+              ELSEIF ( cx2.EQ.'sv'.OR.cx2.EQ.'vs' ) THEN
+                Sp = .TRUE.
+                Vol = .TRUE.
+              ELSEIF ( cx2.EQ.'uv'.OR.cx2.EQ.'vu' ) THEN
+                Hp = .TRUE.
+                Vol = .TRUE.
+              ELSEIF ( cx2.EQ.'tv'.OR.cx2.EQ.'vt' ) THEN
+                Tp = .TRUE.
+                Vol = .TRUE.
+              ELSEIF ( cx2.EQ.'ro'.OR.cx3.EQ.'rkt' ) THEN
+                Rkt = .TRUE.
+              ELSEIF ( cx3.EQ.'dbg'.OR.cx3.EQ.'deb' ) THEN
+                Debugf = .TRUE.
+                Shkdbg = .TRUE.
+                Detdbg = .TRUE.
+              ELSEIF ( cx3.EQ.'fac' ) THEN
+                Rkt = .TRUE.
+                Eql = .TRUE.
+                Fac = .TRUE.
+                Froz = .FALSE.
+              ELSEIF ( cx2.EQ.'eq' ) THEN
+                Eql = .TRUE.
+              ELSEIF ( cx2.EQ.'fr'.OR.cx2.EQ.'fz' ) THEN
+                Froz = .TRUE.
+              ELSEIF ( cx2.EQ.'sh' ) THEN
+                Shock = .TRUE.
+              ELSEIF ( cx3.EQ.'inc' ) THEN
+                Shock = .TRUE.
+                incd = .TRUE.
+                IF ( INDEX(cx15,'eq').GT.0 ) Eql = .TRUE.
+                IF ( INDEX(cx15,'fr').GT.0 ) Froz = .TRUE.
+                IF ( INDEX(cx15,'fz').GT.0 ) Froz = .TRUE.
+              ELSEIF ( cx3.EQ.'ref' ) THEN
+                Shock = .TRUE.
+                refl = .TRUE.
+                IF ( INDEX(cx15,'eq').GT.0 ) Eql = .TRUE.
+                IF ( INDEX(cx15,'fr').GT.0 ) Froz = .TRUE.
+                IF ( INDEX(cx15,'fz').GT.0 ) Froz = .TRUE.
+              ELSEIF ( cx3.EQ.'det' ) THEN
+                Detn = .TRUE.
+              ELSEIF ( cx4.EQ.'ions' ) THEN
+                Ions = .TRUE.
+              ELSE
+                WRITE (IOOUT,99002) cx15
+              ENDIF
+              lcin(i) = 0
+            ENDIF
+ 160      CONTINUE
+          iv = 2
+          Nof = 0
+          GOTO 200
+        ELSEIF ( code(1:3).EQ.'end' ) THEN
+          IF ( Shock ) THEN
+            IF ( incd.AND.Froz ) Incdfz = .TRUE.
+            IF ( incd.AND.Eql ) Incdeq = .TRUE.
+            IF ( refl.AND.Froz ) Reflfz = .TRUE.
+            IF ( refl.AND.Eql ) Refleq = .TRUE.
+          ENDIF
+          Hsub0 = DMIN1(hr,ur)
+          Size = 0.
+          IF ( hr.GT..9D30 ) hr = 0.D0
+          IF ( ur.GT..9D30 ) ur = 0.D0
+          IF ( Trnspt ) Viscns = .3125*DSQRT(1.E5*Boltz/(Pi*Avgdr))
+          IF ( Siunit ) R = Rr/1000.
+          IF ( Detn.OR.Shock ) Newr = .TRUE.
+          IF ( .NOT.Short ) THEN
+            WRITE (IOOUT,99008) Tp,(Hp.AND..NOT.Vol),Sp,(Tp.AND.Vol),(Hp.AND.Vol),(Sp.AND.Vol),Detn,Shock,refl,incd,Rkt,Froz,Eql,Ions,Siunit,Debugf,Shkdbg,Detdbg,Trnspt
+            IF ( T(1).GT.0. ) 
+            WRITE (IOOUT,99009) (T(jj),jj=1,Nt)
+            WRITE (IOOUT,99010) Trace,S0,hr,ur
+            IF ( Np.GT.0.AND.Vol ) 
+            WRITE (IOOUT,99011) (V(jj)*1.D-05,jj=1,Np)
+          ENDIF
+          IF ( Rkt ) THEN
+            IF ( Nt.EQ.0 ) Hp = .TRUE.
+            IF ( .NOT.Short ) THEN
+              WRITE (IOOUT,99012) (P(jj),jj=1,Np)
+              WRITE (IOOUT,99013) (Pcp(jj),jj=1,Npp)
+              WRITE (IOOUT,99014) (Subar(i),i=1,Nsub)
+              WRITE (IOOUT,99015) (Supar(i),i=1,Nsup)
+              WRITE (IOOUT,99016) Nfz,Ma,Acat
+            ENDIF
+          ELSE
+            IF ( .NOT.Vol.AND..NOT.Short ) WRITE (IOOUT,99017) (P(jj),jj=1,Np)
+          ENDIF
+          IF ( reacts ) CALL REACT
+          IF ( Nreac.EQ.0.OR.Nlm.LE.0 ) THEN
+            WRITE (IOOUT,99018)
+            Caseok = .FALSE.
+            WRITE (IOOUT,99025)
+            GOTO 400
+          ENDIF
+          IF ( Nof.EQ.0 ) THEN
+            Nof = 1
+            Oxf(1) = 0.
+            IF ( Wp(2).GT.0. ) THEN
+              Oxf(1) = Wp(1)/Wp(2)
+            ELSE
+              Caseok = .FALSE.
+              WRITE (IOOUT,99004)
+              WRITE (IOOUT,99025)
+              GOTO 400
+            ENDIF
+          ELSEIF ( phi.OR.eqrats ) THEN
+            DO i = 1,Nof
+              eratio = Oxf(i)
+              IF ( eqrats ) THEN
+                xyz = -eratio*Vmin(2) - Vpls(2)
+                denmtr = eratio*Vmin(1) + Vpls(1)
+              ELSE
+                xyz = -Vmin(2) - Vpls(2)
+                denmtr = eratio*(Vmin(1)+Vpls(1))
+              ENDIF
+              IF ( DABS(denmtr).LT.1.D-30 ) THEN
+                Caseok = .FALSE.
+                WRITE (IOOUT,99019) eratio
+                WRITE (IOOUT,99025)
+                GOTO 400
+              ENDIF
+              Oxf(i) = xyz/denmtr
+            ENDDO
+          ENDIF
+          IF ( .NOT.Sp.AND..NOT.Tp.AND..NOT.Hp.AND..NOT.Rkt.AND..NOT.Detn.AND..NOT.Shock ) THEN
+            Caseok = .FALSE.
+            WRITE (IOOUT,99020)
+          ELSEIF ( Tp.AND.T(1).LE.0. ) THEN
+            Caseok = .FALSE.
+            WRITE (IOOUT,99021)
+          ELSEIF ( Np.LE.0 ) THEN
+            Caseok = .FALSE.
+            WRITE (IOOUT,99022)
+          ENDIF
+          IF ( .NOT.(Caseok.AND.Nlm.GT.0) ) WRITE (IOOUT,99025)
+          GOTO 400
+        ELSE
+          WRITE (IOOUT,99023)
+        ENDIF
+      ENDIF
+      GOTO 100
 400 Return    
 99001 FORMAT (/,/)
 99002 FORMAT ()
@@ -371,6 +527,25 @@
 99005 FORMAT ()   
 99006 FORMAT ()  
 99007 FORMAT ()      
+99008 FORMAT ()
+99009 FORMAT ()
+99010 FORMAT ()
+99011 FORMAT ()
+99012 FORMAT ()
+99013 FORMAT ()
+99014 FORMAT ()
+99015 FORMAT ()
+99016 FORMAT ()
+99017 FORMAT ()
+99018 FORMAT ()
+99019 FORMAT ()
+99020 FORMAT ()
+99021 FORMAT ()
+99022 FORMAT ()
+99023 FORMAT ()
+99024 FORMAT ()
+99025 FORMAT ()
+      
 
     END
 !***************************************************
