@@ -266,13 +266,111 @@
                   ENDIF
                   GOTO 140
                 ENDIF 
+! chemical symbol in formula
+                
+                if ( (lcin(i).EQ.-1.OR.lcin(i).EQ.-2).AND.INDEX(uc,cx1).GT.0 )then
+                  Energy(Nreac) = ' '
+                  ifrmla = ifrmla + 1
+                  Nfla(Nreac) = ifrmla
+                  if ( lcin(i).EQ.-2 )then
+                    ix = INDEX(lc,cx2(2:2))
+                    IF ( ix.GT.0 ) cx2(2:2) = uc(ix:ix)
+                  Endif
+                  Ratom(Nreac,ifrmla) = cx2
+                  if ( lcin(i+1).EQ.i )then
+                    Rnum(Nreac,ifrmla) = dpin(i+1)
+                  Else
+                    Rnum(Nreac,ifrmla) = 1.
+                  Endif
+                  i = i + 1
+                  GOTO 140
+                ENDIF
+                WRITE (IOOUT,99007) cin(i)
+              ELSE
+                Nreac = MIN(Nreac+1,MAXR)
+                Fox(Nreac) = cx15
+                i = i + 1
+                IF ( lcin(i).LT.0 ) Rname(Nreac) = cin(i)
+                ifrmla = 0
+                Nfla(Nreac) = 0
+                Energy(Nreac) = 'lib'
+                Enth(Nreac) = 0.
+                Jray(Nreac) = 0
+                Pecwt(Nreac) = -1.
+                Rnum(Nreac,1) = 0.
+                Rmw(Nreac) = 0.
+                Rtemp(Nreac) = 0.
+              ENDIF
+            ENDIF
+            GOTO 140
+                ENDIF
+! input from "PROB" Dataset
+        ELSEIF ( code.EQ.'prob' )then
+          Case = ' '
+          DO i = 1,MAXPV
+            P(i) = 0.
+            V(i) = 0.
+          ENDDO
+          DO i = 1,MAXT
+            T(i) = 0.
+          ENDDO
+          P(1) = 1.
+          Trace = 0.
+          Lsave = 0
+          R = Rr/4184.D0
+          S0 = 0.
+          hr = 1.D30
+          ur = 1.D30
+          Tp = .FALSE.
+          Hp = .FALSE.
+          Sp = .FALSE.
+          Rkt = .FALSE.
+          Shock = .FALSE.
+          Detn = .FALSE.
+          Vol = .FALSE.
+          Ions = .FALSE.
+          Eql = .FALSE.
+          Froz = .FALSE.
+          Fac = .FALSE.
+          Debugf = .FALSE.
+          Acat = 0.
+          Ma = 0.
+          Nfz = 1
+          Nsub = 0
+          Nsup = 0
+          Npp = 0
+          Tcest = 3800.
+          DO i = 1,NCOL
+            Pcp(i) = 0.
+            Pcp(i+NCOL) = 0.
+            Supar(i) = 0.
+            Subar(i) = 0.
+            Mach1(i) = 0.
+            U1(i) = 0.
+          ENDDO
+          Gamma1 = 0.
+          phi = .FALSE.
+          eqrats = .FALSE.
+          incd = .FALSE.
+          refl = .FALSE.
+          Shkdbg = .FALSE.
+          Incdeq = .FALSE.
+          Incdfz = .FALSE.
+          Refleq = .FALSE.
+          Reflfz = .FALSE.
+          Np = 0
+          Nt = 1
+          Trnspt = .FALSE.
+! process literal variables in 'PROB' dataset that do not have numerical data
+          
 400 Return    
 99001 FORMAT (/,/)
 99002 FORMAT ()
 99003 FORMAT ()     
 99004 FORMAT ()
 99005 FORMAT ()   
-99006 FORMAT ()      
+99006 FORMAT ()  
+99007 FORMAT ()      
 
     END
 !***************************************************
